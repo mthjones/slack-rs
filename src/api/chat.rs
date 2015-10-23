@@ -5,6 +5,7 @@
 
 use std::collections::HashMap;
 use hyper;
+use rustc_serialize::json;
 
 use super::ApiResult;
 use super::make_authed_api_call;
@@ -36,12 +37,13 @@ pub fn post_message(client: &hyper::Client,
                     as_user: Option<bool>,
                     parse: Option<&str>,
                     link_names: Option<bool>,
-                    attachments: Option<&str>,
+                    attachments: Option<Vec<super::Attachment>>,
                     unfurl_links: Option<bool>,
                     unfurl_media: Option<bool>,
                     icon_url: Option<&str>,
                     icon_emoji: Option<&str>)
                     -> ApiResult<PostMessageResponse> {
+    let encoded_attachments = try!(json::encode(&attachments));
     let mut params = HashMap::new();
     params.insert("channel", channel);
     params.insert("text", text);
@@ -67,8 +69,8 @@ pub fn post_message(client: &hyper::Client,
                           "0"
                       });
     }
-    if let Some(attachments) = attachments {
-        params.insert("attachments", attachments);
+    if let Some(_) = attachments {
+        params.insert("attachments", &encoded_attachments);
     }
     if let Some(unfurl_links) = unfurl_links {
         params.insert("unfurl_links",

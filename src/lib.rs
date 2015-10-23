@@ -663,18 +663,19 @@ impl RtmClient {
             false => channel,
         };
         let client = hyper::Client::new();
-        api::chat::post_message(&client,
-                                &self.token,
-                                chan_id,
-                                json_payload,
-                                None,
-                                Some(true),
-                                None,
-                                None,
-                                attachments,
-                                None,
-                                None,
-                                None,
+        let attachments: Option<Vec<Attachment>> = attachments.map(|a| json::decode(a).unwrap());
+        api::chat::post_message(&client, 
+                                &self.token, 
+                                chan_id, 
+                                json_payload, 
+                                None, 
+                                Some(true), 
+                                None, 
+                                None, 
+                                attachments, 
+                                None, 
+                                None, 
+                                None, 
                                 None)
     }
 
