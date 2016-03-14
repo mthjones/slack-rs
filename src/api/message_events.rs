@@ -28,10 +28,11 @@ pub enum Message {
     /// Wraps the [`bot_message`](https://api.slack.com/events/message/bot_message) message event.
     BotMessage {
         ts: String,
-        text: String,
+        text: Option<String>,
         bot_id: String,
         username: Option<String>,
-        icons: Option<HashMap<String, String>>,
+        icons: Option<HashMap<String,String>>,
+        attachments: Option<Vec<super::Attachment>>,
     },
     /// Wraps the [`me_message`](https://api.slack.com/events/message/me_message) message event.
     MeMessage {
@@ -227,6 +228,7 @@ impl Decodable for Message {
                 });
             }
             let ty = ty.unwrap();
+<<<<<<< d047d681b490e993d479c580bebd6855eb2e88ae
             match ty.as_ref() {
                 "bot_message" => Ok(Message::BotMessage {
                         ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
@@ -373,6 +375,178 @@ impl Decodable for Message {
                         attachments: try!(d.read_struct_field("attachments", 0, |d| Decodable::decode(d))),
                     }),
                 _ => Err(d.error(&format!("Unknown Message type: {}", ty))),
+=======
+            if ty == "bot_message" {
+                Ok(MessageEvent::BotMessage {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    bot_id: try!(d.read_struct_field("bot_id", 0, |d| Decodable::decode(d))),
+                    username: try!(d.read_struct_field("username", 0, |d| Decodable::decode(d))),
+                    icons: try!(d.read_struct_field("icons", 0, |d| Decodable::decode(d))),
+                    attachments: try!(d.read_struct_field("attachments", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "me_message" {
+                Ok(MessageEvent::MeMessage {
+                    channel: try!(d.read_struct_field("channel", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "message_changed" {
+                Ok(MessageEvent::MessageChanged {
+                    hidden: try!(d.read_struct_field("hidden", 0, |d| Decodable::decode(d))),
+                    channel: try!(d.read_struct_field("channel", 0, |d| Decodable::decode(d))),
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    message: try!(d.read_struct_field("message", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "message_deleted" {
+                Ok(MessageEvent::MessageDeleted {
+                    hidden: try!(d.read_struct_field("hidden", 0, |d| Decodable::decode(d))),
+                    channel: try!(d.read_struct_field("channel", 0, |d| Decodable::decode(d))),
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    deleted_ts: try!(d.read_struct_field("deleted_ts", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_join" {
+                Ok(MessageEvent::ChannelJoin {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    inviter: try!(d.read_struct_field("inviter", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_leave" {
+                Ok(MessageEvent::ChannelLeave {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_topic" {
+                Ok(MessageEvent::ChannelTopic {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    topic: try!(d.read_struct_field("topic", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_purpose" {
+                Ok(MessageEvent::ChannelPurpose {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    purpose: try!(d.read_struct_field("purpose", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_name" {
+                Ok(MessageEvent::ChannelName {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    old_name: try!(d.read_struct_field("old_name", 0, |d| Decodable::decode(d))),
+                    name: try!(d.read_struct_field("name", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_archive" {
+                Ok(MessageEvent::ChannelArchive {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    members: try!(d.read_struct_field("members", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "channel_unarchive" {
+                Ok(MessageEvent::ChannelUnarchive {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_join" {
+                Ok(MessageEvent::GroupJoin {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    inviter: try!(d.read_struct_field("inviter", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_leave" {
+                Ok(MessageEvent::GroupLeave {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_topic" {
+                Ok(MessageEvent::GroupTopic {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    topic: try!(d.read_struct_field("topic", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_purpose" {
+                Ok(MessageEvent::GroupPurpose {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    purpose: try!(d.read_struct_field("purpose", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_name" {
+                Ok(MessageEvent::GroupName {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    old_name: try!(d.read_struct_field("old_name", 0, |d| Decodable::decode(d))),
+                    name: try!(d.read_struct_field("name", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_archive" {
+                Ok(MessageEvent::GroupArchive {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    members: try!(d.read_struct_field("members", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "group_unarchive" {
+                Ok(MessageEvent::GroupUnarchive {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "file_share" {
+                Ok(MessageEvent::FileShare {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    file: try!(d.read_struct_field("file", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    upload: try!(d.read_struct_field("upload", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "file_comment" {
+                Ok(MessageEvent::FileComment {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    file: try!(d.read_struct_field("file", 0, |d| Decodable::decode(d))),
+                    comment: try!(d.read_struct_field("comment", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "file_mention" {
+                Ok(MessageEvent::FileMention {
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    file: try!(d.read_struct_field("file", 0, |d| Decodable::decode(d))),
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "pinned_item" {
+                Ok(MessageEvent::PinnedItem {
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    item_type: try!(d.read_struct_field("item_type", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    item: try!(d.read_struct_field("item", 0, |d| Decodable::decode(d))),
+                    channel: try!(d.read_struct_field("channel", 0, |d| Decodable::decode(d))),
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    attachments: try!(d.read_struct_field("attachments", 0, |d| Decodable::decode(d)))
+                })
+            } else if ty == "unpinned_item" {
+                Ok(MessageEvent::UnpinnedItem {
+                    user: try!(d.read_struct_field("user", 0, |d| Decodable::decode(d))),
+                    item_type: try!(d.read_struct_field("item_type", 0, |d| Decodable::decode(d))),
+                    text: try!(d.read_struct_field("text", 0, |d| Decodable::decode(d))),
+                    item: try!(d.read_struct_field("item", 0, |d| Decodable::decode(d))),
+                    channel: try!(d.read_struct_field("channel", 0, |d| Decodable::decode(d))),
+                    ts: try!(d.read_struct_field("ts", 0, |d| Decodable::decode(d))),
+                    attachments: try!(d.read_struct_field("attachments", 0, |d| Decodable::decode(d)))
+                })
+            } else {
+                Err(d.error(&format!("Unknown MessageEvent type: {}", ty)))
+>>>>>>> Fix issues with messages
             }
         })
     }
